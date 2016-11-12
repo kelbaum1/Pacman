@@ -70,7 +70,7 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return  [w, w, w, w, s, s, e, w]
 
 def depthFirstSearch(problem):
     """
@@ -87,12 +87,50 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    start = problem.getStartState()
+    visited = [start]
+    q = util.Stack()
+    q.push((start, []))
+
+    while not q.isEmpty():
+        front, steps = q.pop()
+
+        if problem.isGoalState(front):
+            #print steps
+            return steps
+
+        for node, step, cost in problem.getSuccessors(front):
+            if node not in visited:
+                visited.append(node)
+                q.push((node, steps + [step]))
+
+    # goal was not found
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start = problem.getStartState()
+    visited = [start]
+    q = util.Queue()
+    q.push((start, []))
+
+    while not q.isEmpty():
+        front, steps = q.pop()
+
+        if problem.isGoalState(front):
+            #print steps
+            return steps
+
+        for node, step, cost in problem.getSuccessors(front):
+            if node not in visited:
+                visited.append(node)
+                q.push((node, steps + [step]))
+
+    # goal was not found
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
