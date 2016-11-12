@@ -70,7 +70,7 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [w, w, w, w, s, s, e, w]
+    return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
     """
@@ -87,22 +87,24 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+
+    # the same as BFS, except we use a stack instead of a queue
     
     start = problem.getStartState()
-    visited = [start]
+    visited = []
     q = util.Stack()
     q.push((start, []))
 
     while not q.isEmpty():
         front, steps = q.pop()
 
+        # goal was found
         if problem.isGoalState(front):
-            #print steps
             return steps
 
-        for node, step, cost in problem.getSuccessors(front):
-            if node not in visited:
-                visited.append(node)
+        if front not in visited:
+            visited.append(front)
+            for node, step, cost in problem.getSuccessors(front):
                 q.push((node, steps + [step]))
 
     # goal was not found
@@ -112,21 +114,23 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
+    # the same as DFS, except we use a queue instead of a stack
+
     start = problem.getStartState()
-    visited = [start]
+    visited = []
     q = util.Queue()
     q.push((start, []))
 
     while not q.isEmpty():
         front, steps = q.pop()
 
+        # goal was found
         if problem.isGoalState(front):
-            #print steps
             return steps
 
-        for node, step, cost in problem.getSuccessors(front):
-            if node not in visited:
-                visited.append(node)
+        if front not in visited:
+            visited.append(front)
+            for node, step, cost in problem.getSuccessors(front):
                 q.push((node, steps + [step]))
 
     # goal was not found
@@ -136,21 +140,23 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
+    # the same as BFS, except we use a priority queue
+
     start = problem.getStartState()
-    visited = [start]
+    visited = []
     q = util.PriorityQueue()
     q.push((start, []), 0)
 
     while not q.isEmpty():
         front, steps = q.pop()
 
+        # goal was found
         if problem.isGoalState(front):
-            #print steps
             return steps
 
-        for node, step, cost in problem.getSuccessors(front):
-            if node not in visited:
-                visited.append(node)
+        if front not in visited:
+            visited.append(front)
+            for node, step, cost in problem.getSuccessors(front):
                 q.push((node, steps + [step]), problem.getCostOfActions(steps + [step]))
 
     # goal was not found
@@ -167,21 +173,23 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
 
+    # the same as UCS, except we also use a heuristic
+
     start = problem.getStartState()
-    visited = [start]
+    visited = []
     q = util.PriorityQueue()
     q.push((start, []), heuristic(start, problem))
 
     while not q.isEmpty():
         front, steps = q.pop()
 
+        # goal was found
         if problem.isGoalState(front):
-            #print steps
             return steps
 
-        for node, step, cost in problem.getSuccessors(front):
-            if node not in visited:
-                visited.append(node)
+        if front not in visited:
+            visited.append(front)
+            for node, step, cost in problem.getSuccessors(front):
                 q.push((node, steps + [step]), problem.getCostOfActions(steps + [step]) + heuristic(node, problem))
 
     # goal was not found
