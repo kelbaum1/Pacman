@@ -387,6 +387,9 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+# original 
+def euclideanDistance(x, y):
+    return ( (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 ) ** 0.5
 
 def cornersHeuristic(state, problem):
     """
@@ -405,7 +408,25 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    cornersLeft = []
+    if not state['lowLeft']:
+        cornersLeft.append(corners[0])
+    if not state['lowRight']:
+        cornersLeft.append(corners[2])
+    if not state['topLeft']:
+        cornersLeft.append(corners[1])
+    if not state['topRight']:
+        cornersLeft.append(corners[3])
+
+    startPos = state['position']
+    totalDistance = 0
+    while cornersLeft:
+        nearest = min(cornersLeft, key=lambda corner: euclideanDistance(startPos, corner))
+        cornersLeft.remove(nearest)
+        totalDistance += euclideanDistance(startPos, nearest)
+        startPos = nearest
+
+    return totalDistance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -498,8 +519,15 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+
     "*** YOUR CODE HERE ***"
-    return 0
+    foodList = foodGrid.asList()
+    if len(foodList) == 0:
+        return 0
+    furthestFood = max(map(lambda food: util.manhattanDistance(position, food), foodList))
+    return furthestFood
+
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
