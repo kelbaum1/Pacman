@@ -124,11 +124,61 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+class Minimax():
+    def __init__(self, state, depth, evaluation):
+        self.depth = depth
+        self.evaluater = evaluation
+        self.root = Node(state, None, 0)
+        self.root.addChildren(depth)
+        
+    def getValue(self):
+        score,action = self.root.bestMove(self.evaluater)
+        return action
+        
+class Node():
+    def __init__(self, state, action, agentId):
+        self.state = state
+        self.agent = agentId
+        self.action = action
+        self.value = None
+        
+        self.children = []
+
+    def addChildren(self, depth):
+        if depth == 0:
+            return
+        moves = self.state.getLegalActions(self.agent)
+        for move in moves:
+            nextState = self.state.generateSuccessor(self.agent, move)
+            nextId = self.agent + 1
+            if nextId >= self.state.getNumAgents():
+                nextId = 0
+            node = Node(nextState, move, nextId)
+            node.addChildren(depth - 1)
+            self.children.append(node)
+            
+    def bestMove(self, evalFuntion):
+        if len(self.children) == 0:
+            return evalFuntion(self.state), self.action
+        minMax = -999999
+        action = None
+        if self.agent > 0:
+            minMax *= -1            
+        for child in self.children:
+            score, act = child.bestMove(evalFuntion)
+            if self.agent == 0 and score > minMax:
+                minMax = score
+                action = act
+            elif self.agent > 0 and score < minMax:
+                minMax = score
+                action = act
+        return score, action
+            
 class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
     """
-
+    
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -148,17 +198,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         """
         "*** YOUR CODE HERE ***"
-        moves = gameState.getLegalActions(agentIndex)
-        best_move = moves[0]
-        best_score = -9999999
-        for move in moves:
-            clone = gameState.generateSuccessor(agentIndex, move)
-            score = min_play(clone)
-            if score > best_score:
-                best_score = score
-                best_move = move
-        return best_move
-
+        tree = Minimax(gameState, self.depth, self.evaluationFunction)
+        return tree.getValue()
+#        
+#        moves = gameState.getLegalActions(agentIndex)
+#        best_move = moves[0]
+#        best_score = -9999999
+#        for move in moves:
+#            clone = gameState.generateSuccessor(agentIndex, move)
+#            score = min_play(clone)
+#            if score > best_score:
+#                best_score = score
+#                best_move = move
+        
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
