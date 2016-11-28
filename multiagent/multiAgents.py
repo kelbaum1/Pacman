@@ -212,7 +212,68 @@ class MinimaxAgent(MultiAgentSearchAgent):
 #                best_score = score
 #                best_move = move
         
+class AlphaBetaTree():
+    def __init__(self, state, turns, evaluation):
+        self.evaluater = evaluation
+        self.root = AlphaBetaNode(state, turns * state.getNumAgents(), None, 0)
+
+    def getValue(self):
+       value, action = self.root.getMinMaxValue(self.evaluater)
+       return action
         
+class AlphaBetaNode():
+    def __init__(self, state, depth, action, agentId, alpha = -99999, beta = 99999):
+        self.state = state
+        self.action = action
+        self.agent = agentId
+        self.depth = depth
+        self.alpha = alpha
+        self.beta = beta
+    
+    def getMinMaxValue(self, evalFunction):
+        moves = self.state.getLegalActions(self.agent)
+        if len(moves) == 0 or self.depth < 1:
+            return evalFunction(self.state), self.action
+        action = None
+        newAlpha = -99999
+        newBeta = 99999
+        for move in moves:
+            #cutoffs
+            if self.agent == 0:
+                if newAlpha > self.beta:
+                    break
+            elif self.agent > 0:
+                if newBeta < self.alpha:
+                    break
+            nextState = self.state.generateSuccessor(self.agent, move)
+            nextId = self.agent + 1
+            if nextId >= self.state.getNumAgents():
+                nextId = 0
+            node = None
+            if self.agent == 0:
+                alphaState = max([newAlpha, self.alpha])
+                node = AlphaBetaNode(nextState, self.depth - 1, move, nextId,
+                                 alphaState, self.beta)
+            elif self.agent > 0:
+                betaState = min([newBeta, self.beta])
+                node = AlphaBetaNode(nextState, self.depth - 1, move, nextId,
+                                 self.alpha, betaState)
+            value, act = node.getMinMaxValue(evalFunction)
+            if self.agent == 0:
+                #max node
+                if value > newAlpha:
+                    newAlpha = value
+                    action = move
+            elif self.agent > 0:
+                #min node
+                if value < newBeta:
+                    newBeta = value
+                    action = move
+        if self.agent == 0:
+            return newAlpha, action
+        elif self.agent > 0:
+            return newBeta, action
+            
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
@@ -223,8 +284,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        tree = AlphaBetaTree(gameState, self.depth, self.evaluationFunction)
+        return tree.getValue(
+                             )
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
