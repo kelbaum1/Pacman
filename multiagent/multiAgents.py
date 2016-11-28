@@ -125,27 +125,27 @@ class MultiAgentSearchAgent(Agent):
         self.depth = int(depth)
 
 class Minimax():
-    def __init__(self, state, depth, evaluation):
-        self.depth = depth
+    def __init__(self, state, turns, evaluation):
         self.evaluater = evaluation
-        self.root = Node(state, None, 0)
-        self.root.addChildren(depth)
+        self.root = MinMaxNode(state, None, 0)
+        self.root.addChildren(turns * state.getNumAgents())
         
     def getValue(self):
         score,action = self.root.bestMove(self.evaluater)
         return action
         
-class Node():
+class MinMaxNode():
     def __init__(self, state, action, agentId):
         self.state = state
+        # the number of the agent whose turn it is at this MinMaxNode
         self.agent = agentId
+        #the action that got us to this state, taken by agent - 1
         self.action = action
-        self.value = None
-        
+        self.depth = -1
         self.children = []
 
     def addChildren(self, depth):
-        if depth == 0:
+        if depth < 1:
             return
         moves = self.state.getLegalActions(self.agent)
         for move in moves:
@@ -153,7 +153,8 @@ class Node():
             nextId = self.agent + 1
             if nextId >= self.state.getNumAgents():
                 nextId = 0
-            node = Node(nextState, move, nextId)
+            node = MinMaxNode(nextState, move, nextId)
+            node.depth = depth
             node.addChildren(depth - 1)
             self.children.append(node)
             
@@ -168,11 +169,11 @@ class Node():
             score, act = child.bestMove(evalFuntion)
             if self.agent == 0 and score > minMax:
                 minMax = score
-                action = act
+                action = child.action
             elif self.agent > 0 and score < minMax:
                 minMax = score
-                action = act
-        return score, action
+                action = child.action
+        return minMax, action
             
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -210,6 +211,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 #            if score > best_score:
 #                best_score = score
 #                best_move = move
+        
         
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
