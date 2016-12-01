@@ -124,11 +124,62 @@ class MultiAgentSearchAgent(Agent):
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
+class Minimax():
+    def __init__(self, state, turns, evaluation):
+        self.evaluater = evaluation
+        self.root = MinMaxNode(state, None, 0)
+        self.root.addChildren(turns * state.getNumAgents())
+        
+    def getValue(self):
+        score,action = self.root.bestMove(self.evaluater)
+        return action
+        
+class MinMaxNode():
+    def __init__(self, state, action, agentId):
+        self.state = state
+        # the number of the agent whose turn it is at this MinMaxNode
+        self.agent = agentId
+        #the action that got us to this state, taken by agent - 1
+        self.action = action
+        self.depth = -1
+        self.children = []
+
+    def addChildren(self, depth):
+        if depth < 1:
+            return
+        moves = self.state.getLegalActions(self.agent)
+        for move in moves:
+            nextState = self.state.generateSuccessor(self.agent, move)
+            nextId = self.agent + 1
+            if nextId >= self.state.getNumAgents():
+                nextId = 0
+            node = MinMaxNode(nextState, move, nextId)
+            node.depth = depth
+            node.addChildren(depth - 1)
+            self.children.append(node)
+            
+    def bestMove(self, evalFuntion):
+        if len(self.children) == 0:
+            return evalFuntion(self.state), self.action
+        minMax = -999999
+        action = None
+        if self.agent > 0:
+            minMax *= -1            
+        for child in self.children:
+            score, act = child.bestMove(evalFuntion)
+            if self.agent == 0 and score > minMax:
+                minMax = score
+                action = child.action
+            elif self.agent > 0 and score < minMax:
+                minMax = score
+                action = child.action
+        return minMax, action
+            
 class MinimaxAgent(MultiAgentSearchAgent):
     """
       Your minimax agent (question 2)
     """
-
+    
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -148,17 +199,81 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         """
         "*** YOUR CODE HERE ***"
-        moves = gameState.getLegalActions(agentIndex)
-        best_move = moves[0]
-        best_score = -9999999
-        for move in moves:
-            clone = gameState.generateSuccessor(agentIndex, move)
-            score = min_play(clone)
-            if score > best_score:
-                best_score = score
-                best_move = move
-        return best_move
+        tree = Minimax(gameState, self.depth, self.evaluationFunction)
+        return tree.getValue()
+#        
+#        moves = gameState.getLegalActions(agentIndex)
+#        best_move = moves[0]
+#        best_score = -9999999
+#        for move in moves:
+#            clone = gameState.generateSuccessor(agentIndex, move)
+#            score = min_play(clone)
+#            if score > best_score:
+#                best_score = score
+#                best_move = move
+        
+class AlphaBetaTree():
+    def __init__(self, state, turns, evaluation):
+        self.evaluater = evaluation
+        self.root = AlphaBetaNode(state, turns * state.getNumAgents(), None, 0)
 
+    def getValue(self):
+       value, action = self.root.getMinMaxValue(self.evaluater)
+       return action
+        
+class AlphaBetaNode():
+    def __init__(self, state, depth, action, agentId, alpha = -99999, beta = 99999):
+        self.state = state
+        self.action = action
+        self.agent = agentId
+        self.depth = depth
+        self.alpha = alpha
+        self.beta = beta
+    
+    def getMinMaxValue(self, evalFunction):
+        moves = self.state.getLegalActions(self.agent)
+        if len(moves) == 0 or self.depth < 1:
+            return evalFunction(self.state), self.action
+        action = None
+        newAlpha = -99999
+        newBeta = 99999
+        for move in moves:
+            #cutoffs
+            if self.agent == 0:
+                if newAlpha > self.beta:
+                    break
+            elif self.agent > 0:
+                if newBeta < self.alpha:
+                    break
+            nextState = self.state.generateSuccessor(self.agent, move)
+            nextId = self.agent + 1
+            if nextId >= self.state.getNumAgents():
+                nextId = 0
+            node = None
+            if self.agent == 0:
+                alphaState = max([newAlpha, self.alpha])
+                node = AlphaBetaNode(nextState, self.depth - 1, move, nextId,
+                                 alphaState, self.beta)
+            elif self.agent > 0:
+                betaState = min([newBeta, self.beta])
+                node = AlphaBetaNode(nextState, self.depth - 1, move, nextId,
+                                 self.alpha, betaState)
+            value, act = node.getMinMaxValue(evalFunction)
+            if self.agent == 0:
+                #max node
+                if value > newAlpha:
+                    newAlpha = value
+                    action = move
+            elif self.agent > 0:
+                #min node
+                if value < newBeta:
+                    newBeta = value
+                    action = move
+        if self.agent == 0:
+            return newAlpha, action
+        elif self.agent > 0:
+            return newBeta, action
+            
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
@@ -169,8 +284,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        tree = AlphaBetaTree(gameState, self.depth, self.evaluationFunction)
+        return tree.getValue(
+                             )
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
