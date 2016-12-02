@@ -46,14 +46,16 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         for i in range(self.iterations):
+            newMap = util.Counter()
             mdpStates = self.mdp.getStates()
             for state in mdpStates:
                 
                 if self.mdp.isTerminal(state):
-                    self.values[state] = 0
+                    #self.values[state] = 0
+                    newMap[state] = 0
                 else:
                     mdpActions = self.mdp.getPossibleActions(state)
-                    maxValue = float("inf") * -1
+                    maxValue = float("-inf")
                     for action in mdpActions:
                        listOfNexts = mdp.getTransitionStatesAndProbs(state, action)
                        summation = 0
@@ -64,8 +66,9 @@ class ValueIterationAgent(ValueEstimationAgent):
                             summation += prob * (self.mdp.getReward(state, action, nextState) + (self.discount * self.values[nextState]))
                             #maxValue = (summation > maxValue) ? summation : maxValue
                        maxValue = max(summation, maxValue)
-                       self.values[state] = maxValue
-                        
+                       newMap[state] = maxValue
+                       #self.values[state] = maxValue
+            self.values = newMap 
 
     def getValue(self, state):
         """
@@ -107,8 +110,8 @@ class ValueIterationAgent(ValueEstimationAgent):
             bestAction = None
             for ea in stateActions:
                 qVal = self.computeQValueFromValues(state, ea)
-                maxValue = max(qVal, maxValue)
-                if (maxValue == qVal):
+                if( qVal >= maxValue):
+                    maxValue = qVal
                     bestAction = ea
             return bestAction
 
