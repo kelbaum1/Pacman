@@ -128,10 +128,10 @@ class QLearningAgent(ReinforcementAgent):
             return action
         else:
             #exploration, with probability epsilon, act randomly else act according to current policy
-            if util.flipCoin(prob):
+            if util.flipCoin(self.epsilon):
                 return random.choice(legalActions)
             else:    
-                return self.getPolicy(self, state)
+                return self.getPolicy(state)
 
         return action
         util.raiseNotDefined()
