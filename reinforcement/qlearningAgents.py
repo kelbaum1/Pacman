@@ -77,7 +77,7 @@ class QLearningAgent(ReinforcementAgent):
             max_action = None
             max_qValue = float("-inf")
             for action in legalAct:
-                actionValue = getQValue(self, state, action)
+                actionValue = self.getQValue(state, action)
                 if (actionValue >= max_qValue):
                     max_qValue = actionValue
                     max_action = action
@@ -100,7 +100,7 @@ class QLearningAgent(ReinforcementAgent):
             max_action = None
             max_qValue = float("-inf")
             for action in legalAct:
-                actionValue = getQValue(self, state, action)
+                actionValue = self.getQValue(state, action)
                 if (actionValue >= max_qValue):
                     max_qValue = actionValue
                     max_action = action
@@ -159,7 +159,7 @@ class QLearningAgent(ReinforcementAgent):
 
         '''
         # (1-alpha)Qi(s,a) + alpha (R(sa,a,s;) + gamma max (Q (s', a'))
-        self.qValues[(state,action)] = ( 1 - self.alpha) * self.getQValue(self, state, action) + (self.alpha * ( reward + (self.discount * self.getValue(nextState)))) 
+        self.qValues[(state,action)] = ( 1 - self.alpha) * self.getQValue(state, action) + (self.alpha * ( reward + (self.discount * self.getValue(nextState)))) 
 
         #util.raiseNotDefined()
 
