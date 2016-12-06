@@ -226,11 +226,10 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        w = self.weights
-        featureVector = self.featExtractor.getFeatures(state, action)
-        qValue = numpy.dot( w, featureVector )
-        self.qValues[(state, action)] = qValue
-        return qValue
+        featureDict = self.featExtractor.getFeatures(state, action)
+        for key in featureDict.keys():
+            self.qValues[(state, action)] += self.weights[key] * featureDict[key]
+        return self.qValues[(state, action)]
 
     def update(self, state, action, nextState, reward):
         """
