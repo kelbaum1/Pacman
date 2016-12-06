@@ -227,16 +227,17 @@ class ApproximateQAgent(PacmanQAgent):
         """
         "*** YOUR CODE HERE ***"
         featureDict = self.featExtractor.getFeatures(state, action)
-        for key in featureDict.keys():
-            self.qValues[(state, action)] += self.weights[key] * featureDict[key]
-        return self.qValues[(state, action)]
+        qValue = 0
+        for key in featureDict:
+            qValue += self.getWeights()[key] * featureDict[key]
+        return qValue
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        difference = reward + (self.discount * self.getValue(nextState)) - self.qValues[(state, action)]
+        difference = reward + (self.discount * self.getValue(nextState)) - self.getQValue(state, action)
         featureDict = self.featExtractor.getFeatures(state, action)
         for key in featureDict.keys():
             self.weights[key] += self.alpha * difference * featureDict[key]
