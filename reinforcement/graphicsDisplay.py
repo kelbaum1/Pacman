@@ -550,7 +550,7 @@ class PacmanGraphics:
             dot = circle( (screen_x, screen_y),
                               CAPSULE_SIZE * self.gridSize,
                               outlineColor = CAPSULE_COLOR,
-                              fillColor = formatColor(random.uniform(0.2, 1),random.uniform(0.2, 1),random.uniform(0.2, 1)),
+                              fillColor = CAPSULE_COLOR,
                               width = 1)
             capsuleImages[capsule] = dot
         return capsuleImages
