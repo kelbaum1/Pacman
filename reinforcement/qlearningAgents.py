@@ -238,9 +238,9 @@ class ApproximateQAgent(PacmanQAgent):
         """
         "*** YOUR CODE HERE ***"
         difference = reward + (self.discount * self.getValue(nextState)) - self.qValues[(state, action)]
-        featureVector = self.featExtractor.getFeatures(state, action)
-        print featureVector.values()
-        self.weights += numpy.dot(self.alpha * difference * featureVector.items())
+        featureDict = self.featExtractor.getFeatures(state, action)
+        for key in featureDict.keys():
+            self.weights[key] += self.alpha * difference * featureDict[key]
 
     def final(self, state):
         "Called at the end of each game."
