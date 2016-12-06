@@ -429,7 +429,8 @@ class PacmanGraphics:
         return ( x, y )
 
     def drawWalls(self, wallMatrix):
-        wallColor = WALL_COLOR
+        #wallColor = WALL_COLOR
+        wallColor = formatColor(random.uniform(0.2, 1),random.uniform(0.2, 1),random.uniform(0.2, 1))
         for xNum, x in enumerate(wallMatrix):
             if self.capture and (xNum * 2) < wallMatrix.width: wallColor = TEAM_COLORS[0]
             if self.capture and (xNum * 2) >= wallMatrix.width: wallColor = TEAM_COLORS[1]
@@ -523,7 +524,7 @@ class PacmanGraphics:
 
     def drawFood(self, foodMatrix ):
         foodImages = []
-        color = FOOD_COLOR
+        #color = FOOD_COLOR
         color = formatColor(random.uniform(0.2, 1),random.uniform(0.2, 1),random.uniform(0.2, 1))
         for xNum, x in enumerate(foodMatrix):
             if self.capture and (xNum * 2) <= foodMatrix.width: color = TEAM_COLORS[0]
@@ -549,7 +550,7 @@ class PacmanGraphics:
             dot = circle( (screen_x, screen_y),
                               CAPSULE_SIZE * self.gridSize,
                               outlineColor = CAPSULE_COLOR,
-                              fillColor = CAPSULE_COLOR,
+                              fillColor = formatColor(random.uniform(0.2, 1),random.uniform(0.2, 1),random.uniform(0.2, 1)),
                               width = 1)
             capsuleImages[capsule] = dot
         return capsuleImages
