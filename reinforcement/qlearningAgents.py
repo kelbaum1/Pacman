@@ -18,6 +18,8 @@ from featureExtractors import *
 
 import random,util,math
 
+import numpy
+
 class QLearningAgent(ReinforcementAgent):
     """
       Q-Learning Agent
@@ -224,14 +226,21 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        w = self.weights
+        featureVector = self.featExtractor.getFeatures(state, action)
+        qValue = numpy.dot( w, featureVector )
+        self.qValues[(state, action)] = qValue
+        return qValue
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        difference = reward + (self.discount * self.getValue(nextState)) - self.qValues[(state, action)]
+        featureVector = self.featExtractor.getFeatures(state, action)
+        print featureVector.values()
+        self.weights += numpy.dot(self.alpha * difference * featureVector.items())
 
     def final(self, state):
         "Called at the end of each game."
