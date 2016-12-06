@@ -229,7 +229,7 @@ class ApproximateQAgent(PacmanQAgent):
         featureDict = self.featExtractor.getFeatures(state, action)
         qValue = 0
         for key in featureDict:
-            qValue += self.getWeights()[key] * featureDict[key]
+            qValue += self.weights[key] * featureDict[key]
         return qValue
 
     def update(self, state, action, nextState, reward):
