@@ -525,7 +525,8 @@ def foodHeuristic(state, problem):
     if len(foodList) == 0:
         return 0
     furthestFood = max(map(lambda food: util.manhattanDistance(position, food), foodList))
-    return furthestFood
+    closestFood = min(map(lambda food: util.manhattanDistance(position, food), foodList))
+    return max(furthestFood, closestFood + len(foodList) - 1)
 
 
 
