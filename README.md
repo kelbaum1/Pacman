@@ -1,6 +1,7 @@
 # Pacman
 # Final Project for UMBC CMSC 471 Artificial Intelligence
 # Michael Kelbaugh, Matthew Landen, Celestine Wong
+# UC Berkeley Pac-Man Projects
 # http://ai.berkeley.edu/project_overview.html
 
 # All you need to run the code is a standard Python 2.7 installation.
